@@ -3,6 +3,7 @@ package com.xxf.baking.ui.activity;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -27,7 +28,9 @@ import org.json.JSONObject;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -139,11 +142,14 @@ public class AppWidgetConfigureActivity extends AppCompatActivity {
             JSONObject recipe = recipes.getJSONObject(i);
             String name = recipe.getString("name");
 //            Log.d("name",name);
-
             recipeNames.add(name);
 
         }
 
+        Set set = new HashSet(recipeNames);
+        SharedPreferences.Editor editor = getSharedPreferences("recipeNames",0).edit();
+        editor.putStringSet("string",set);
+        editor.commit();
     }
 
 

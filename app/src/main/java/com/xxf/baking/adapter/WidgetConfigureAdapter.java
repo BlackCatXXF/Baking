@@ -52,6 +52,7 @@ public class WidgetConfigureAdapter extends RecyclerView.Adapter<WidgetConfigure
                 SharedPreferences.Editor prefs = mContext.getSharedPreferences(mContext.getString(R.string.prefs_name),0).edit();
                 prefs.putInt(mContext.getString(R.string.pref_position),viewHolder.getLayoutPosition());
                 prefs.putString(mContext.getString(R.string.RecipeName),mNames.get(viewHolder.getLayoutPosition()));
+
                 prefs.commit();
 
                 AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(mContext);

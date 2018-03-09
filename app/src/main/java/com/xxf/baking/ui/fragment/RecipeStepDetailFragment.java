@@ -1,5 +1,6 @@
 package com.xxf.baking.ui.fragment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
@@ -80,6 +81,8 @@ public class RecipeStepDetailFragment extends Fragment {
     private Step step = new Step();
     private int stepPosition;
 
+    private Context mContext;
+
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -99,14 +102,30 @@ public class RecipeStepDetailFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_recipe_step_detail,container,false);
 
         ButterKnife.bind(this, view);
-        fetchData(Constants.API.RECIPE_JSON);
+//        fetchData(Constants.API.RECIPE_JSON);
         if (isPad(getContext())){
             hideButton();
         }else {
             next();
         }
+        if (savedInstanceState!= null){
+            player.seekTo(savedInstanceState.getLong("position"));
+            player.setPlayWhenReady(savedInstanceState.getBoolean("readyState"));
+        }
+
 
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        long position = player.getCurrentPosition();
+        boolean readyState = player.getPlayWhenReady();
+        outState.putLong("position",position);
+        outState.putBoolean("readyState",readyState);
+
     }
 
     private void next(){
@@ -289,4 +308,43 @@ public class RecipeStepDetailFragment extends Fragment {
         return netInfo != null && netInfo.isConnected();
     }
 
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mContext = activity;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (Util.SDK_INT > 23) {
+            fetchData(Constants.API.RECIPE_JSON); // 初始化播放器
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if ((Util.SDK_INT <= 23 || player == null)) {
+            fetchData(Constants.API.RECIPE_JSON); // 初始化播放器
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (Util.SDK_INT <= 23) {
+            player.release(); // 释放播放器
+
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (Util.SDK_INT > 23) {
+            player.release();// 释放播放器
+        }
+    }
 }
