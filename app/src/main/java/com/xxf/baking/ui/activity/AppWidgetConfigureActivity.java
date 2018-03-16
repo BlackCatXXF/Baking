@@ -146,10 +146,7 @@ public class AppWidgetConfigureActivity extends AppCompatActivity {
 
         }
 
-        Set set = new HashSet(recipeNames);
-        SharedPreferences.Editor editor = getSharedPreferences("recipeNames",0).edit();
-        editor.putStringSet("string",set);
-        editor.commit();
+
     }
 
 

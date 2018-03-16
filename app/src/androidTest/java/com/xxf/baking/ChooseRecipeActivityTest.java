@@ -16,11 +16,7 @@ import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.Matchers.allOf;
 
 /**
  * Created by dell on 2018/3/6.
@@ -30,7 +26,7 @@ public class ChooseRecipeActivityTest {
 
 
     @Rule
-    public ActivityTestRule<ChooseRecipeActivity> mActivityTestRule = new ActivityTestRule<>(ChooseRecipeActivity.class,false,false);
+    public ActivityTestRule<ChooseRecipeActivity> mActivityTestRule = new ActivityTestRule<>(ChooseRecipeActivity.class);
 
     private static final Intent MY_ACTIVITY_INTENT = new Intent(InstrumentationRegistry.getTargetContext(), ChooseRecipeActivity.class);
 
@@ -41,14 +37,10 @@ public class ChooseRecipeActivityTest {
 
     @Test
     public void clickRecyclerViewItem(){
-
         ChooseRecipeFragment fragment = new ChooseRecipeFragment();
         mActivityTestRule.getActivity().getSupportFragmentManager().beginTransaction().add(R.id.activity_choose_recipe, fragment).commit();
 
-        onView(allOf(withId(R.id.recyclerview_choose_recipe),isDisplayed())).perform(RecyclerViewActions.actionOnItemAtPosition(0,click()));
-        onView(withId(R.id.recyclerview_choose_recipe))
-                .perform(RecyclerViewActions.actionOnItem(
-                        hasDescendant(withText("Brownies")), click()));
+        onView(withId(R.id.recyclerview_choose_recipe)).perform(RecyclerViewActions.actionOnItemAtPosition(1,click()));
     }
 
 

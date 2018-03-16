@@ -11,10 +11,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.xxf.baking.Constants;
 import com.xxf.baking.R;
 import com.xxf.baking.RecipeWidgetProvider;
+import com.xxf.baking.utils.NetworkUtils;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -27,6 +38,11 @@ public class WidgetConfigureAdapter extends RecyclerView.Adapter<WidgetConfigure
     private List<String> mNames;
     private int mAppWidgetId;
     private AppCompatActivity mActivity;
+
+    private URL  url;
+    private int position;
+    private ArrayList<CharSequence> ingredients = new ArrayList<>();
+
 
     public WidgetConfigureAdapter(AppCompatActivity activity,Context context, List<String> names,int mAppWidgetId){
         mContext = context;
@@ -44,16 +60,16 @@ public class WidgetConfigureAdapter extends RecyclerView.Adapter<WidgetConfigure
         viewHolder.mTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(mContext, RecipeDetailActivity.class);
-//                intent.putExtra("position",viewHolder.getLayoutPosition());
-//                intent.putExtra(mContext.getString(R.string.RecipeName),mNames.get(viewHolder.getLayoutPosition()));
-//                mContext.startActivity(intent);
 
                 SharedPreferences.Editor prefs = mContext.getSharedPreferences(mContext.getString(R.string.prefs_name),0).edit();
                 prefs.putInt(mContext.getString(R.string.pref_position),viewHolder.getLayoutPosition());
                 prefs.putString(mContext.getString(R.string.RecipeName),mNames.get(viewHolder.getLayoutPosition()));
 
                 prefs.commit();
+
+                position = viewHolder.getLayoutPosition();
+
+                fetchData();
 
                 AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(mContext);
                 RecipeWidgetProvider.updateAppWidget(mContext, appWidgetManager, mAppWidgetId);
@@ -90,5 +106,62 @@ public class WidgetConfigureAdapter extends RecyclerView.Adapter<WidgetConfigure
             mTextView = itemView.findViewById(R.id.recipe_name);
         }
     }
+
+
+    private void fetchData() {
+
+            try {
+                url = new URL(Constants.API.RECIPE_JSON);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        String jsonResponse = NetworkUtils.getResponseFromHttpUrl(url);
+                        if (ingredients != null) {
+                            ingredients.clear();
+                        }
+                        parseJson(jsonResponse);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+
+
+
+
+    }
+
+    private void parseJson(String json) throws JSONException {
+
+        JSONArray recipes = new JSONArray(json);
+        JSONObject recipe = recipes.getJSONObject(position);
+//        Log.d("position", String.valueOf(position));
+        JSONArray ingredientJsonArray = recipe.getJSONArray("ingredients");
+        for (int i = 0; i < ingredientJsonArray.length(); i++) {
+            JSONObject ingredient = ingredientJsonArray.getJSONObject(i);
+            int quantity = ingredient.getInt("quantity");
+            String measure = ingredient.getString("measure");
+            String food = ingredient.getString("ingredient");
+
+            CharSequence s = food +"  "+ quantity+"  " + measure;
+//            Log.d("s",s);
+            ingredients.add(s);
+
+        }
+
+        Set set = new HashSet(ingredients);
+        SharedPreferences.Editor editor = mActivity.getSharedPreferences("recipeNames",0).edit();
+        editor.putStringSet("string",set);
+        editor.commit();
+
+
+    }
+
 
 }
