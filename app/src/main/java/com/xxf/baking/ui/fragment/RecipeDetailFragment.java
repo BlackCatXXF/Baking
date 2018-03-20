@@ -3,6 +3,7 @@ package com.xxf.baking.ui.fragment;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -27,6 +28,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -78,7 +80,13 @@ public class RecipeDetailFragment extends Fragment {
 
         initToolbar();
 
-        fetchData(Constants.API.RECIPE_JSON);
+//        fetchData(Constants.API.RECIPE_JSON);
+        try {
+            url = new URL(Constants.API.RECIPE_JSON);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        new DownloadTask().execute(url);
         initRecyclerView();
         return view;
     }
@@ -130,7 +138,7 @@ public class RecipeDetailFragment extends Fragment {
                         parseJson(jsonResponse);
                         Message message = new Message();
                         message.what = UPDATA_DATA;
-                        mHandler.sendMessage(message);
+//                        mHandler.sendMessage(message);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -173,5 +181,32 @@ public class RecipeDetailFragment extends Fragment {
         return netInfo != null && netInfo.isConnected();
     }
 
+    private class DownloadTask extends AsyncTask<URL, Integer, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(URL... urls) {
+            try {
+                jsonResponse = NetworkUtils.getResponseFromHttpUrl(urls[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (receipDetails != null) {
+                receipDetails.clear();
+            }
+            try {
+                parseJson(jsonResponse);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            mRecipeDetailAdapter.setData(receipDetails);
+        }
+    }
 
 }

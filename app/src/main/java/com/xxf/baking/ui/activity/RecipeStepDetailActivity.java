@@ -18,11 +18,13 @@ public class RecipeStepDetailActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_step_detail);
-
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.activity_recipe_step_detail,new RecipeStepDetailFragment())
+        if (savedInstanceState == null){
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.activity_recipe_step_detail,new RecipeStepDetailFragment())
 //                    .addToBackStack(null)
-                .commit();
+                    .commit();
+        }
+
     }
 }
