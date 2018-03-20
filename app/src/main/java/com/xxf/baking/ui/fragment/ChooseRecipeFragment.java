@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -27,6 +28,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -59,7 +61,7 @@ public class ChooseRecipeFragment extends Fragment {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case UPDATA_DATA:
-                    recipeCardAdapter.setData(recipeNames);
+
             }
         }
     };
@@ -70,7 +72,13 @@ public class ChooseRecipeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_choose_recipe,container,false);
         ButterKnife.bind(this,view);
 
-        fetchData(Constants.API.RECIPE_JSON);
+//        fetchData(Constants.API.RECIPE_JSON);
+        try {
+            url = new URL(Constants.API.RECIPE_JSON);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        new DownloadTask().execute(url);
         initRecyclerView();
         return view;
     }
@@ -151,5 +159,32 @@ public class ChooseRecipeFragment extends Fragment {
     }
 
 
+    private class DownloadTask extends AsyncTask<URL, Integer, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(URL... urls) {
+            try {
+                jsonResponse = NetworkUtils.getResponseFromHttpUrl(urls[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (recipeNames != null) {
+                recipeNames.clear();
+            }
+            try {
+                parseJson(jsonResponse);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            recipeCardAdapter.setData(recipeNames);
+        }
+    }
 
 }

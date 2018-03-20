@@ -16,6 +16,8 @@ import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isFocusable;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
 /**
@@ -38,9 +40,9 @@ public class ChooseRecipeActivityTest {
     @Test
     public void clickRecyclerViewItem(){
         ChooseRecipeFragment fragment = new ChooseRecipeFragment();
-        mActivityTestRule.getActivity().getSupportFragmentManager().beginTransaction().add(R.id.activity_choose_recipe, fragment).commit();
+        mActivityTestRule.getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.activity_choose_recipe, fragment).commitAllowingStateLoss();
 
-        onView(withId(R.id.recyclerview_choose_recipe)).perform(RecyclerViewActions.actionOnItemAtPosition(1,click()));
+        onView(withId(R.id.recyclerview_choose_recipe)).perform(RecyclerViewActions.actionOnItemAtPosition(1,click())).check(matches(isFocusable()));
     }
 
 

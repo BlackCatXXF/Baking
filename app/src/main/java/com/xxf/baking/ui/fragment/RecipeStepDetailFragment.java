@@ -83,6 +83,9 @@ public class RecipeStepDetailFragment extends Fragment {
 
     private Context mContext;
 
+    private long videoPosition = 0;
+    private boolean videoReady;
+
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -108,11 +111,11 @@ public class RecipeStepDetailFragment extends Fragment {
         }else {
             next();
         }
-        if (savedInstanceState!= null){
-            player.seekTo(savedInstanceState.getLong("position"));
-            player.setPlayWhenReady(savedInstanceState.getBoolean("readyState"));
-        }
 
+        if (savedInstanceState!= null){
+            videoPosition = savedInstanceState.getLong("position");
+            videoReady = savedInstanceState.getBoolean("readyState");
+        }
 
         return view;
     }
@@ -121,10 +124,10 @@ public class RecipeStepDetailFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        long position = player.getCurrentPosition();
-        boolean readyState = player.getPlayWhenReady();
-        outState.putLong("position",position);
-        outState.putBoolean("readyState",readyState);
+        videoPosition = player.getCurrentPosition();
+        videoReady = player.getPlayWhenReady();
+        outState.putLong("position",videoPosition);
+        outState.putBoolean("readyState",videoReady);
 
     }
 
@@ -181,6 +184,7 @@ public class RecipeStepDetailFragment extends Fragment {
             stepPosition = getActivity().getIntent().getIntExtra(getString(R.string.stepPosition),0);
         }
 
+
     }
 
     public void setStepPosition(int position){
@@ -207,6 +211,7 @@ public class RecipeStepDetailFragment extends Fragment {
          */
         LoadControl loadControl = new DefaultLoadControl();
         player = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector,loadControl);
+
         /**
          * 设置用户控制，其实就是屏幕上的功能按钮，默认显示，false则不显示，设置false后可自定义
          *
@@ -215,6 +220,7 @@ public class RecipeStepDetailFragment extends Fragment {
          *
          * @param useController Whether the playback controls can be shown.
          */
+
         playerView.setUseController(true);
         playerView.requestFocus();
 
@@ -253,7 +259,10 @@ public class RecipeStepDetailFragment extends Fragment {
         /**
          * 开始播放
          */
-        player.setPlayWhenReady(true);
+        player.setPlayWhenReady(videoReady);
+        if (videoPosition!=0){
+            player.seekTo(videoPosition);
+        }
     }
 
     private void fetchData(final String httpUrl) {
