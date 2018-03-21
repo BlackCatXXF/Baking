@@ -21,26 +21,29 @@ public class RecipeDetailActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
 
-        if (isPad(this)){
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.activity_recipe_detail,new RecipeDetailFragment())
+        if (savedInstanceState == null){
+            if (isPad(this)){
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.activity_recipe_detail,new RecipeDetailFragment())
 //                    .addToBackStack(null)
-                    .commit();
+                        .commit();
 
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.recipe_step_detail,new RecipeStepDetailFragment())
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.recipe_step_detail,new RecipeStepDetailFragment())
 //                    .addToBackStack(null)
-                    .commit();
+                        .commit();
 
-        }else {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.activity_recipe_detail,new RecipeDetailFragment())
+            }else {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.activity_recipe_detail,new RecipeDetailFragment())
 //                    .addToBackStack(null)
-                    .commit();
+                        .commit();
+            }
         }
+
 
 
     }

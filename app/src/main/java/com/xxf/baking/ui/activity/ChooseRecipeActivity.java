@@ -13,10 +13,12 @@ public class ChooseRecipeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_recipe);
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.activity_choose_recipe,new ChooseRecipeFragment())
+        if (savedInstanceState == null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.activity_choose_recipe, new ChooseRecipeFragment())
 //                    .addToBackStack(null)
-                .commit();
+                    .commit();
+        }
     }
 }
